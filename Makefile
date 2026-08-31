@@ -32,10 +32,13 @@ run: ## Run agent in a dir with extensions. Usage: make run ~/my-project
 shell: ## Open bash in a container. Usage: make shell ~/my-project
 	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER) /bin/bash
 
+TTYD_PORT ?= 7681
+TTYD_THEME ?= theme={"background": "black"}
+
 serve: ## Run agent via ttyd in browser (http://localhost:7681). Usage: make serve ~/my-project
 	@echo "Extensions: $(EXTENSIONS)"
-	@echo "Open http://localhost:7681 in your browser"
-	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -p 7681:7681 -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER)
+	@echo "Open http://localhost:$(TTYD_PORT) in your browser"
+	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -p $(TTYD_PORT):$(TTYD_PORT) -e TTYD_PORT=$(TTYD_PORT) -e TTYD_THEME=$(TTYD_THEME) -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER)
 
 rm: ## Remove the image
 	docker rmi $(CONTAINER)

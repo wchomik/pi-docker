@@ -10,4 +10,8 @@ if [ -n "$PI_EXTENSIONS" ]; then
   done
 fi
 
-exec ttyd -t 'theme={"background": "black"}' -p 7681 -W tmux new -A -s webshell bash
+# Configurable via TTYD_PORT and TTYD_THEME environment variables
+TTYD_PORT="${TTYD_PORT:-7681}"
+TTYD_THEME="${TTYD_THEME:-theme={"background": "black"}}"
+
+exec ttyd -t "$TTYD_THEME" -p "$TTYD_PORT" -W tmux new -A -s webshell bash

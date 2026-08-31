@@ -55,6 +55,32 @@ make run EXTENSIONS= ~/my-project
 
 Extensions are installed at container startup — no rebuild needed.
 
+## ttyd Configuration
+
+ttyd (the browser-based terminal) can be customized via environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `TTYD_PORT` | `7681` | Port ttyd listens on |
+| `TTYD_THEME` | `theme={"background": "black"}` | ttyd theme options (JSON) |
+
+```bash
+# Custom port
+make serve TTYD_PORT=8080 ~/my-project
+
+# Custom theme (e.g. dark gray background)
+make serve TTYD_THEME='theme={"background": "#1e1e1e"}' ~/my-project
+
+# Both
+make serve TTYD_PORT=9000 TTYD_THEME='theme={"background": "#1e1e1e"}' ~/my-project
+```
+
+You can also set them directly when running the container:
+
+```bash
+docker run -e TTYD_PORT=8080 -e TTYD_THEME='theme={"background": "#1e1e1e"}' ...
+```
+
 ## Docker Image
 
 The image is published to GitHub Container Registry on every release:
