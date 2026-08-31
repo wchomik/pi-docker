@@ -10,15 +10,4 @@ if [ -n "$PI_EXTENSIONS" ]; then
   done
 fi
 
-# Build extension flags for pi (e.g., -e pi-observability -e pi-web-access)
-EXT_FLAGS=""
-if [ -n "$PI_EXTENSIONS" ]; then
-  IFS=',' read -ra EXTS <<< "$PI_EXTENSIONS"
-  for ext in "${EXTS[@]}"; do
-    ext="$(echo "$ext" | xargs)"
-    [ -z "$ext" ] && continue
-    EXT_FLAGS="$EXT_FLAGS -e $ext"
-  done
-fi
-
-exec ttyd -p 7681 -W pi $EXT_FLAGS "$@"
+exec ttyd -t 'theme={"background": "black"}' -p 7681 -W tmux new -A -s webshell bash
