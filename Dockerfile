@@ -2,19 +2,24 @@
 FROM node:25-trixie
 
 # Install git as it is often required for coding agents
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y curl git python3 python-is-python3 tmux vim fd-find\
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LOk https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep_15.2.0-1_amd64.deb
+RUN dpkg -i ripgrep_15.2.0-1_amd64.deb && rm ripgrep_15.2.0-1_amd64.deb
 
 # Update npm
 RUN npm install -g npm
 
 # Install the pi coding agent globally
-RUN npm install -g @earendil-works/pi-coding-agent
+RUN curl -fsSLk https://pi.dev/install.sh | sh
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Install ttyd for browser-based terminal access
-RUN curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/local/bin/ttyd && chmod +x /usr/local/bin/ttyd
+RUN curl -fsSLk https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/local/bin/ttyd && chmod +x /usr/local/bin/ttyd
 
 EXPOSE 7681
 
