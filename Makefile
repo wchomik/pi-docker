@@ -11,6 +11,10 @@ $(eval $(RUN_ARGS):;@:)
 # e.g. EXTENSIONS=npm:pi-observability,npm:pi-web-access
 EXTENSIONS ?= npm:pi-observability,npm:pi-web-access
 
+# Path to pi home directory on the host to mount into the container.
+# Set to empty string to disable mounting (e.g. PI_HOME=).
+PI_HOME ?= ~/.pi
+
 .PHONY: help build update refresh run shell serve rm
 
 help: ## Show help
@@ -27,18 +31,27 @@ refresh: ## Rebuild the image (run this after changing dependencies)
 
 run: ## Run agent in a dir with extensions. Usage: make run ~/my-project
 	@echo "Extensions: $(EXTENSIONS)"
-	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER) pi
+ifneq ($(PI_HOME),)
+	@echo "PI_HOME: $(PI_HOME)"
+endif
+	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it $(if $(PI_HOME),-v $$(realpath $(PI_HOME)):/root/.pi,) -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER) pi
 
 shell: ## Open bash in a container. Usage: make shell ~/my-project
-	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER) /bin/bash
+ifneq ($(PI_HOME),)
+	@echo "PI_HOME: $(PI_HOME)"
+endif
+	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it $(if $(PI_HOME),-v $$(realpath $(PI_HOME)):/root/.pi,) -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER) /bin/bash
 
 TTYD_PORT ?= 7681
 TTYD_THEME ?= theme={"background": "black"}
 
 serve: ## Run agent via ttyd in browser (http://localhost:7681). Usage: make serve ~/my-project
 	@echo "Extensions: $(EXTENSIONS)"
+ifneq ($(PI_HOME),)
+	@echo "PI_HOME: $(PI_HOME)"
+endif
 	@echo "Open http://localhost:$(TTYD_PORT) in your browser"
-	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -p $(TTYD_PORT):$(TTYD_PORT) -e TTYD_PORT=$(TTYD_PORT) -e TTYD_THEME=$(TTYD_THEME) -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER)
+	@WORK_DIR=$(or $(RUN_ARGS),.) && docker run --rm -it -p $(TTYD_PORT):$(TTYD_PORT) $(if $(PI_HOME),-v $$(realpath $(PI_HOME)):/root/.pi,) -e TTYD_PORT=$(TTYD_PORT) -e TTYD_THEME=$(TTYD_THEME) -e PI_EXTENSIONS=$(EXTENSIONS) -v $$WORK_DIR:/work -w /work $(CONTAINER)
 
 rm: ## Remove the image
 	docker rmi $(CONTAINER)

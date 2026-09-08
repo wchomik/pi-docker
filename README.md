@@ -55,6 +55,22 @@ make run EXTENSIONS= ~/my-project
 
 Extensions are installed at container startup — no rebuild needed.
 
+## Pi Home Directory
+
+Your pi home directory (`~/.pi`) is automatically mounted into the container so settings, extensions, auth, and sessions persist across runs.
+
+The host path can be customized via the `PI_HOME` variable:
+
+```bash
+# Custom pi home path
+make run PI_HOME=/custom/path/.pi ~/my-project
+
+# Disable mounting pi home entirely
+make run PI_HOME= ~/my-project
+```
+
+This applies to all commands (`run`, `shell`, `serve`).
+
 ## ttyd Configuration
 
 ttyd (the browser-based terminal) can be customized via environment variables:
